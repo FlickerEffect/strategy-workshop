@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Strategy Workshop | Vision & Planning</title>
+<title>Strategy Workshop</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root {
@@ -672,7 +672,7 @@ select.form-input { cursor: pointer; }
 <div id="pw-gate" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0e1a;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 <div style="background:#111827;padding:40px;border-radius:12px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.5);">
 <h2 style="color:#f1f5f9;margin-bottom:8px;">🐝 Strategy Workshop</h2>
-<p style="color:#94a3b8;margin-bottom:20px;font-size:13px;">Scaling Up · Vision & Planning</p>
+<p style="color:#94a3b8;margin-bottom:20px;font-size:13px;">Planning · Vision & Planning</p>
 <input id="pw-input" type="password" placeholder="Enter password" style="padding:12px 20px;border-radius:8px;border:1px solid #2d3748;background:#1f2937;color:#f1f5f9;font-size:16px;width:250px;text-align:center;" onkeydown="if(event.key==='Enter')checkPw()">
 <br><br>
 <button onclick="checkPw()" style="padding:10px 30px;border-radius:8px;border:none;background:#3b82f6;color:white;font-size:14px;cursor:pointer;">Enter</button>
@@ -692,7 +692,7 @@ if(localStorage.getItem('pw_ok')=='1') document.addEventListener('DOMContentLoad
 </script>
 
 <div class="header">
-  <div class="header-logo">🐝 <span>KingBee</span> · Scaling Up</div>
+  <div class="header-logo">🐝 <span>KingBee</span> · Planning</div>
   <div class="header-company" id="header-company">Humla Ventures</div>
   <div class="header-actions">
     <div class="save-indicator">
@@ -1323,7 +1323,7 @@ function renderOnePage() {
           <div class="opsp-company">${plan.meta.company} — One Page Strategic Plan</div>
           <div class="opsp-date">Updated: ${new Date(plan.meta.updatedAt).toLocaleDateString()} · ${cq} · Owner: ${plan.meta.owner}</div>
         </div>
-        <div style="font-size:11px;color:var(--text3)">Scaling Up Framework · Verne Harnish</div>
+        <div style="font-size:11px;color:var(--text3)">Planning Framework · Verne Harnish</div>
       </div>
 
       <div class="opsp-grid">
