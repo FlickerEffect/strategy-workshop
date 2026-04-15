@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Strategy Workshop | Vision & Planning</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface2: #1f2937;
+  --surface3: #374151;
+  --border: #2d3748;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --accent: #3b82f6;
+  --accent2: #6366f1;
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --purple: #8b5cf6;
+  --cyan: #06b6d4;
+  --orange: #f97316;
+  --navy: #1e3a5f;
+  --status-none: #374151;
+  --status-progress: #1e3a5f;
+  --status-done: #064e3b;
+  --status-blocked: #7f1d1d;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --transition: 0.2s ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ─── HEADER ─── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-logo {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-logo span { color: var(--text); }
+.header-company {
+  font-size: 13px;
+  color: var(--text2);
+  border-left: 1px solid var(--border);
+  padding-left: 16px;
+}
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.btn:hover { background: var(--surface3); border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: #2563eb; border-color: #2563eb; color: #fff; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-icon { padding: 6px; width: 32px; justify-content: center; }
+.btn-success { background: var(--green); border-color: var(--green); color: #fff; }
+.btn-success:hover { background: #059669; color: #fff; }
+.btn-danger { background: var(--red); border-color: var(--red); color: #fff; }
+.btn-danger:hover { background: #dc2626; color: #fff; }
+
+/* ─── NAV TABS ─── */
+.nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  padding: 0 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-tab {
+  padding: 12px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-tab:hover { color: var(--text2); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ─── BREADCRUMB ─── */
+.breadcrumb {
+  padding: 10px 20px;
+  font-size: 12px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breadcrumb-item { cursor: pointer; color: var(--text2); }
+.breadcrumb-item:hover { color: var(--accent); }
+.breadcrumb-sep { color: var(--text3); }
+
+/* ─── MAIN CONTENT ─── */
+.main { padding: 20px; max-width: 1400px; margin: 0 auto; }
+
+/* ─── BOARD LAYOUT ─── */
+.board {
+  display: grid;
+  gap: 16px;
+}
+.board-2 { grid-template-columns: repeat(2, 1fr); }
+.board-3 { grid-template-columns: repeat(3, 1fr); }
+.board-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 900px) {
+  .board-4, .board-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .board-2, .board-3, .board-4 { grid-template-columns: 1fr; }
+}
+
+/* ─── COLUMN ─── */
+.col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.col-header {
+  padding: 12px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+.col-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.col-icon { font-size: 14px; }
+.col-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+/* ─── CARD ─── */
+.card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+.card:hover { border-color: var(--accent); background: var(--surface3); }
+.card.status-not-started { border-left: 3px solid var(--status-none); }
+.card.status-in-progress { border-left: 3px solid var(--accent); background: rgba(59,130,246,0.05); }
+.card.status-complete { border-left: 3px solid var(--green); background: rgba(16,185,129,0.05); }
+.card.status-blocked { border-left: 3px solid var(--red); background: rgba(239,68,68,0.05); }
+
+.card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.card-sub { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+.card-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.tag {
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tag-progress { background: rgba(59,130,246,0.2); color: var(--accent); }
+.tag-done { background: rgba(16,185,129,0.2); color: var(--green); }
+.tag-blocked { background: rgba(239,68,68,0.2); color: var(--red); }
+.tag-none { background: rgba(100,116,139,0.2); color: var(--text3); }
+.tag-kpi { background: rgba(245,158,11,0.2); color: var(--yellow); }
+.avatar {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ─── METRIC CARD ─── */
+.metric-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+.metric-value { font-size: 28px; font-weight: 700; color: var(--accent); }
+.metric-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.metric-sub { font-size: 11px; color: var(--text3); }
+
+/* ─── SECTION TITLE ─── */
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section { margin-bottom: 28px; }
+
+/* ─── WIDE CARD (for values, purpose etc) ─── */
+.wide-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.wide-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wide-card-content { color: var(--text); font-size: 14px; line-height: 1.6; }
+
+/* ─── BHAG CARD ─── */
+.bhag-card {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f35 100%);
+  border: 1px solid #3b82f6;
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.bhag-card::before {
+  content: '🚀';
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 40px;
+  opacity: 0.3;
+}
+.bhag-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+.bhag-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  max-width: 80%;
+}
+.bhag-year {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* ─── HEDGEHOG ─── */
+.hedgehog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media (max-width: 700px) { .hedgehog-grid { grid-template-columns: 1fr; } }
+.hedgehog-circle {
+  background: var(--surface);
+  border: 2px solid;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+.hedgehog-circle:nth-child(1) { border-color: var(--accent); }
+.hedgehog-circle:nth-child(2) { border-color: var(--green); }
+.hedgehog-circle:nth-child(3) { border-color: var(--yellow); }
+.hedgehog-icon { font-size: 24px; margin-bottom: 8px; }
+.hedgehog-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.hedgehog-circle:nth-child(1) .hedgehog-label { color: var(--accent); }
+.hedgehog-circle:nth-child(2) .hedgehog-label { color: var(--green); }
+.hedgehog-circle:nth-child(3) .hedgehog-label { color: var(--yellow); }
+.hedgehog-text { font-size: 12px; color: var(--text2); line-height: 1.4; }
+
+/* ─── TABLE ─── */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.tbl td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(45,55,72,0.5);
+  color: var(--text);
+  vertical-align: top;
+}
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: rgba(59,130,246,0.03); }
+.tbl-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+/* ─── STATUS SELECT ─── */
+.status-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── ONE PAGE VIEW ─── */
+#opsp-view {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.opsp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  min-height: 600px;
+  border: 1px solid var(--border);
+}
+@media (max-width: 1100px) {
+  .opsp-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 700px) {
+  .opsp-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.opsp-col {
+  border-right: 1px solid var(--border);
+  min-width: 0;
+}
+.opsp-col:last-child { border-right: none; }
+.opsp-col-header {
+  padding: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 2px solid;
+  text-align: center;
+}
+.opsp-col:nth-child(1) .opsp-col-header { color: var(--purple); border-color: var(--purple); background: rgba(139,92,246,0.08); }
+.opsp-col:nth-child(2) .opsp-col-header { color: var(--cyan); border-color: var(--cyan); background: rgba(6,182,212,0.08); }
+.opsp-col:nth-child(3) .opsp-col-header { color: var(--green); border-color: var(--green); background: rgba(16,185,129,0.08); }
+.opsp-col:nth-child(4) .opsp-col-header { color: var(--yellow); border-color: var(--yellow); background: rgba(245,158,11,0.08); }
+.opsp-col:nth-child(5) .opsp-col-header { color: var(--accent); border-color: var(--accent); background: rgba(59,130,246,0.08); }
+.opsp-col:nth-child(6) .opsp-col-header { color: var(--orange); border-color: var(--orange); background: rgba(249,115,22,0.08); }
+.opsp-col:nth-child(7) .opsp-col-header { color: var(--red); border-color: var(--red); background: rgba(239,68,68,0.08); }
+.opsp-col-body { padding: 8px; font-size: 11px; }
+.opsp-section { margin-bottom: 10px; }
+.opsp-section-title { font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.opsp-item { padding: 3px 0; color: var(--text2); border-bottom: 1px dotted rgba(45,55,72,0.5); font-size: 11px; }
+.opsp-item:last-child { border-bottom: none; }
+.opsp-highlight {
+  background: rgba(59,130,246,0.1);
+  border-radius: 4px;
+  padding: 6px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+  border-left: 2px solid var(--accent);
+}
+.opsp-title-bar {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.opsp-company { font-size: 16px; font-weight: 700; }
+.opsp-date { font-size: 12px; color: var(--text3); }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+.modal-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title { font-size: 15px; font-weight: 700; }
+.modal-body { padding: 20px; }
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ─── FORM ─── */
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.form-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 12px;
+  font-family: inherit;
+  transition: var(--transition);
+}
+.form-input:focus { outline: none; border-color: var(--accent); }
+textarea.form-input { resize: vertical; min-height: 80px; }
+select.form-input { cursor: pointer; }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  font-size: 13px;
+  box-shadow: var(--shadow);
+  z-index: 2000;
+  animation: slideUp 0.3s ease;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.toast.success { border-color: var(--green); }
+.toast.error { border-color: var(--red); }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ─── PROGRESS BAR ─── */
+.progress-bar { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+
+/* ─── CRITICAL NUMBER ─── */
+.critical-number {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a1f35 100%);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.cn-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cyan); margin-bottom: 6px; }
+.cn-value { font-size: 16px; font-weight: 700; color: #fff; }
+.cn-owner { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* ─── FILTER BAR ─── */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.filter-chip:hover { border-color: var(--accent); }
+
+/* ─── QUARTER SELECTOR ─── */
+.quarter-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.q-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  transition: var(--transition);
+}
+.q-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.q-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+/* ─── LOADING ─── */
+.loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: var(--text3); gap: 12px; font-size: 14px; }
+.spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── SAVE INDICATOR ─── */
+.save-indicator { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 6px; }
+.save-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.save-dot.unsaved { background: var(--yellow); animation: pulse 1.5s ease infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ─── SIDEBAR PANEL ─── */
+.sidebar-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+@media (max-width: 900px) { .sidebar-layout { grid-template-columns: 1fr; } }
+.sidebar { display: flex; flex-direction: column; gap: 12px; }
+.sidebar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.sidebar-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 12px; }
+
+/* ─── DRAG & DROP ─── */
+.dragging { opacity: 0.5; transform: scale(0.98); }
+.drag-over { border-color: var(--accent) !important; background: rgba(59,130,246,0.08) !important; }
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  color: var(--text3);
+  font-size: 13px;
+}
+.empty-icon { font-size: 32px; margin-bottom: 8px; }
+
+/* ─── VERSION HISTORY ─── */
+.version-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.version-item:last-child { border-bottom: none; }
+.version-time { color: var(--text2); }
+.version-id { color: var(--text3); font-family: monospace; }
+
+/* ─── PRINT STYLES ─── */
+@media print {
+  .header, .nav, .breadcrumb, .btn, .filter-bar, .quarter-selector { display: none !important; }
+  body { background: white; color: black; }
+  .opsp-grid { color: black; }
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--surface3); }
+</style>
+</head>
+<body>
+<div id="pw-gate" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0e1a;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<div style="background:#111827;padding:40px;border-radius:12px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.5);">
+<h2 style="color:#f1f5f9;margin-bottom:8px;">🐝 Strategy Workshop</h2>
+<p style="color:#94a3b8;margin-bottom:20px;font-size:13px;">Scaling Up · Vision & Planning</p>
+<input id="pw-input" type="password" placeholder="Enter password" style="padding:12px 20px;border-radius:8px;border:1px solid #2d3748;background:#1f2937;color:#f1f5f9;font-size:16px;width:250px;text-align:center;" onkeydown="if(event.key==='Enter')checkPw()">
+<br><br>
+<button onclick="checkPw()" style="padding:10px 30px;border-radius:8px;border:none;background:#3b82f6;color:white;font-size:14px;cursor:pointer;">Enter</button>
+<p id="pw-error" style="color:#ef4444;margin-top:10px;display:none;">Wrong password</p>
+</div>
+</div>
+<script>
+function checkPw(){
+  if(document.getElementById('pw-input').value==='12341234'){
+    document.getElementById('pw-gate').style.display='none';
+    localStorage.setItem('pw_ok','1');
+  } else {
+    document.getElementById('pw-error').style.display='block';
+  }
+}
+if(localStorage.getItem('pw_ok')=='1') document.addEventListener('DOMContentLoaded',()=>{var g=document.getElementById('pw-gate');if(g)g.style.display='none';});
+</script>
+
+<div class="header">
+  <div class="header-logo">🐝 <span>KingBee</span> · Scaling Up</div>
+  <div class="header-company" id="header-company">Humla Ventures</div>
+  <div class="header-actions">
+    <div class="save-indicator">
+      <div class="save-dot" id="save-dot"></div>
+      <span id="save-status">Saved</span>
+    </div>
+    <button class="btn" onclick="showVersions()">🕐 History</button>
+    <button class="btn" onclick="exportPDF()">📄 Export PDF</button>
+    <button class="btn-primary btn" onclick="savePlan()">💾 Save</button>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('vision')" id="tab-vision">
+    <span style="color:var(--purple)">⬡</span> Vision
+  </div>
+  <div class="nav-tab" onclick="showTab('annual')" id="tab-annual">
+    <span style="color:var(--green)">📅</span> Annual Plan
+  </div>
+  <div class="nav-tab" onclick="showTab('quarterly')" id="tab-quarterly">
+    <span style="color:var(--yellow)">⚡</span> Quarterly Rocks
+  </div>
+  <div class="nav-tab" onclick="showTab('monthly')" id="tab-monthly">
+    <span style="color:var(--cyan)">📆</span> Monthly Goals
+  </div>
+  <div class="nav-tab" onclick="showTab('onepage')" id="tab-onepage">
+    <span style="color:var(--accent)">📋</span> One Page View
+  </div>
+  <div class="nav-tab" onclick="showTab('strata')" id="tab-strata">
+    <span style="color:var(--orange)">🏔</span> 7 Strata
+  </div>
+</div>
+
+<div id="tab-content">
+  <div class="loading"><div class="spinner"></div> Loading plan...</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeModalOnOverlay(event)">
+  <div class="modal" id="modal-inner">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Edit</div>
+      <button class="btn btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/scaling-up-api/api';
+let plan = null;
+let activeTab = 'vision';
+let currentModal = null;
+let unsaved = false;
+let dragSource = null;
+
+// ─── DATA MANAGEMENT ───────────────────────────────────────────────────────
+
+async function loadPlan() {
+  // Try localStorage first, then embedded default
+  const stored = localStorage.getItem('scalingUpPlan');
+  if (stored) {
+    try {
+      plan = JSON.parse(stored);
+      renderTab(activeTab);
+      showToast('📂 Loaded from local storage');
+      return;
+    } catch(e) {}
+  }
+  plan = {"meta": {"company": "Humla Ventures", "owner": "Greg Carson", "createdAt": "2026-04-15T20:02:04.400Z", "updatedAt": "2026-04-15T20:02:04.400Z"}, "vision": {"coreValues": [{"id": "v1", "value": "Make others rich", "description": "Create wealth for LPs, founders, and partners before yourself", "status": "active"}, {"id": "v2", "value": "Keep your word", "description": "Promises are sacred currency", "status": "active"}, {"id": "v3", "value": "Document everything", "description": "If it's not written down, it didn't happen", "status": "active"}, {"id": "v4", "value": "Think bigger every month", "description": "The ambition ceiling rises continuously", "status": "active"}, {"id": "v5", "value": "Truth over comfort", "description": "Privilege ground truth over pleasant narratives", "status": "active"}, {"id": "v6", "value": "Stay out of jail first", "description": "The Walton Laws \u2014 legality, preservation, returns \u2014 in order", "status": "active"}], "purpose": "To make as many people 7-8 figures as possible through smart venture capital, while building a flywheel of income and value accretion.", "bhag": {"text": "Build Humla into a $500M+ AUM multi-strategy venture platform generating top-decile returns, with a self-sustaining team that outlasts any individual.", "targetYear": 2040, "type": "target"}, "vividDescription": "Humla is recognized as a top-tier emerging manager with a track record of consistent 3x+ net returns, a growing LP base of 200+ investors, and multiple fund strategies across venture, opportunity, and co-invest vehicles.", "hedgehog": {"bestAt": "Operator-led venture capital \u2014 a GP who builds, not just invests", "economicEngine": "Carry per LP dollar invested (Net IRR above 20% = carry generation)", "passion": "Making founders and LPs wealthy through superior deal access and hands-on support"}, "threeToFiveYear": {"targetDate": "2029-12-31", "revenue": "$2.5M+ management fees/year", "aum": "$150M+", "metrics": [{"id": "m1", "metric": "Total AUM", "current": "~$60M", "target": "$150M+", "owner": "Greg"}, {"id": "m2", "metric": "Net IRR (flagship)", "current": "21.6%", "target": ">25%", "owner": "Greg"}, {"id": "m3", "metric": "LP count", "current": "55", "target": "150+", "owner": "Greg / Perkins"}, {"id": "m4", "metric": "Portfolio companies", "current": "25", "target": "50+", "owner": "Felix"}, {"id": "m5", "metric": "Carry generated", "current": "$0", "target": "$5M+ realized", "owner": "Greg"}]}, "brandPromises": [{"id": "bp1", "promise": "Top-quartile returns", "kpi": "Net TVPI > 2.5x, Net IRR > 20%", "guarantee": "Transparent quarterly reporting with full attribution"}, {"id": "bp2", "promise": "Founder-first engagement", "kpi": "Founder NPS > 70", "guarantee": "Direct GP access for all portfolio CEOs"}, {"id": "bp3", "promise": "Radical transparency", "kpi": "LP reporting within 45 days of quarter end", "guarantee": "Real-time portfolio dashboard access"}], "profitPerX": "Carried interest per LP dollar invested", "sandbox": "Accredited investors and family offices seeking emerging tech exposure (AI, crypto/DeFi, deep tech) through a GP with operator DNA and institutional discipline.", "sevenStrata": {"wordsOwn": "Operator-led venture capital", "sandboxPromises": "Accredited investors wanting AI/crypto exposure with institutional discipline", "guarantee": "Real-time portfolio dashboard + quarterly reporting within 45 days", "onePhrase": "Builder's Edge \u2014 invest where operational experience creates information advantage", "activities": ["AI-powered operations (KingBee) \u2014 institutional capability at emerging manager cost", "Deep crypto/DeFi network and technical due diligence", "Hands-on portfolio support for founders", "PR/media access for portfolio companies", "Multi-entity flexibility across SPVs, funds, and co-invests"], "xFactor": "KingBee AI OS \u2014 12-agent team providing institutional-grade operations at emerging manager cost", "profitBhag": "$500M AUM, top-decile returns, 200+ LPs"}}, "annual": {"year": 2026, "revenueTarget": "$10M in new LP commitments", "profitTarget": "$1.2M management fees", "criticalNumber": "$10M in new LP commitments by Dec 31, 2026", "rocks": [{"id": "r1", "title": "Close Humla DF Fund I and CF Fund I", "owner": "Greg", "kpi": "Capital committed", "target": "$5M+ each", "status": "in-progress", "initiatives": ["Schedule LP roadshow", "Complete PPM documents", "Engage placement agent"]}, {"id": "r2", "title": "Complete BSP IV exit strategy", "owner": "Greg", "kpi": "TVPI maintenance", "target": ">7x", "status": "not-started", "initiatives": ["Secondary market analysis", "LP distribution options", "Secondary buyer outreach"]}, {"id": "r3", "title": "Establish KingBee AI OS as operational backbone", "owner": "Greg/Flynn", "kpi": "Agent coverage", "target": "Full team operational", "status": "in-progress", "initiatives": ["Deploy all 12 agents", "Build monitoring dashboards", "Document all workflows"]}, {"id": "r4", "title": "Build IR pipeline for Fund III", "owner": "Greg/Perkins", "kpi": "Qualified LP meetings", "target": "50+ meetings", "status": "not-started", "initiatives": ["LP database build", "Conference attendance plan", "Cold outreach campaign"]}, {"id": "r5", "title": "Execute OpNet/Motoswap investments", "owner": "Greg", "kpi": "Deals closed", "target": "$1M+ deployed", "status": "in-progress", "initiatives": ["Finalize $1M investment at $50M val", "Execute 2x $25K investments", "Token warrant documentation"]}], "keyHires": [{"role": "IR / Fundraising support", "why": "Scale LP outreach beyond personal network", "byWhen": "Q3 2026"}, {"role": "Part-time CFO / Controller", "why": "Institutional-grade financial reporting", "byWhen": "Q2 2026"}]}, "quarterly": {"currentQuarter": "Q2-2026", "quarters": {"Q2-2026": {"criticalNumber": "Complete first close on Humla Ventures DF Fund I ($2M+ committed)", "criticalOwner": "Greg", "rocks": [{"id": "qr1", "title": "DF Fund I first close", "owner": "Greg", "dod": "$2M+ LP commitments signed", "deadline": "2026-06-30", "status": "in-progress"}, {"id": "qr2", "title": "Complete Copiia investment", "owner": "Greg", "dod": "$100K deployed, docs signed", "deadline": "2026-05-15", "status": "in-progress"}, {"id": "qr3", "title": "OpNet $1M investment structure finalized", "owner": "Greg", "dod": "Term sheet + legal docs complete", "deadline": "2026-06-15", "status": "in-progress"}, {"id": "qr4", "title": "KingBee AI OS fully operational", "owner": "Greg/Flynn", "dod": "Aris, Moneypenny, Morgan, Smith live", "deadline": "2026-06-30", "status": "in-progress"}, {"id": "qr5", "title": "Q1 LP reporting for all vehicles", "owner": "Greg/Morgan", "dod": "Reports sent to all LPs", "deadline": "2026-04-30", "status": "not-started"}], "sayingNo": ["New fund structures beyond DF and CF", "Any deal outside current thesis (AI, crypto/DeFi, deep tech)", "Spending time on XBTO relationship renegotiation (park until Q3)"], "theme": {"name": "First Close, First Blood", "description": "Land the first close on the Humla-branded fund", "celebration": "Dinner at top San Juan restaurant with Tania when first close hits", "deadline": "2026-06-30"}, "thirteenWeekRace": [], "monthlyTargets": {"April 2026": [{"id": "mt1", "title": "Complete Q1 LP reports", "owner": "Morgan/Greg", "status": "not-started", "dueDate": "2026-04-30"}, {"id": "mt2", "title": "Copiia investment first steps", "owner": "Greg", "status": "in-progress", "dueDate": "2026-04-30"}], "May 2026": [{"id": "mt3", "title": "Copiia investment close", "owner": "Greg", "status": "not-started", "dueDate": "2026-05-15"}, {"id": "mt4", "title": "DF Fund I \u2014 3+ LP meetings", "owner": "Greg", "status": "not-started", "dueDate": "2026-05-31"}], "June 2026": [{"id": "mt5", "title": "DF Fund I first close", "owner": "Greg", "status": "not-started", "dueDate": "2026-06-30"}, {"id": "mt6", "title": "OpNet deal close", "owner": "Greg", "status": "not-started", "dueDate": "2026-06-15"}]}}}}, "team": [{"id": "t1", "name": "Greg Carson", "role": "GP / CEO", "initials": "GC", "color": "#3B82F6"}, {"id": "t2", "name": "Aris", "role": "Chief of Staff", "initials": "AR", "color": "#8B5CF6"}, {"id": "t3", "name": "Morgan", "role": "CFO Agent", "initials": "MO", "color": "#10B981"}, {"id": "t4", "name": "Flynn", "role": "Head of Product", "initials": "FL", "color": "#F59E0B"}, {"id": "t5", "name": "Felix", "role": "Deal Flow", "initials": "FX", "color": "#EF4444"}, {"id": "t6", "name": "Perkins", "role": "Head of IR", "initials": "PK", "color": "#06B6D4"}]};
+  renderTab(activeTab);
+}
+
+async function savePlan() {
+  try {
+    markSaving();
+    const r = await fetch(`${API}/plan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(plan)
+    });
+    const j = await r.json();
+    if (j.ok) {
+      markSaved();
+      showToast('✅ Plan saved (v' + j.versionId + ')');
+    } else {
+      showToast('Save failed: ' + j.error, 'error');
+    }
+  } catch (e) {
+    showToast('Save error: ' + e.message, 'error');
+  }
+}
+
+function markUnsaved() {
+  unsaved = true;
+  document.getElementById('save-dot').className = 'save-dot unsaved';
+  document.getElementById('save-status').textContent = 'Unsaved';
+}
+function markSaving() {
+  document.getElementById('save-status').textContent = 'Saving...';
+}
+function markSaved() {
+  unsaved = false;
+  document.getElementById('save-dot').className = 'save-dot';
+  document.getElementById('save-status').textContent = 'Saved';
+}
+
+// Auto-save every 60s if unsaved
+setInterval(() => { if (unsaved) savePlan(); }, 60000);
+
+// ─── TAB ROUTING ───────────────────────────────────────────────────────────
+
+function showTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  renderTab(tab);
+}
+
+function renderTab(tab) {
+  if (!plan) return;
+  const el = document.getElementById('tab-content');
+  switch (tab) {
+    case 'vision':    el.innerHTML = renderVision(); break;
+    case 'annual':    el.innerHTML = renderAnnual(); break;
+    case 'quarterly': el.innerHTML = renderQuarterly(); break;
+    case 'monthly':   el.innerHTML = renderMonthly(); break;
+    case 'onepage':   el.innerHTML = renderOnePage(); break;
+    case 'strata':    el.innerHTML = renderStrata(); break;
+  }
+  attachDragDrop();
+}
+
+// ─── STATUS HELPERS ────────────────────────────────────────────────────────
+
+function statusTag(s) {
+  const map = {
+    'not-started': ['tag-none','Not Started'],
+    'in-progress': ['tag-progress','In Progress'],
+    'complete': ['tag-done','Complete'],
+    'blocked': ['tag-blocked','Blocked']
+  };
+  const [cls, label] = map[s] || ['tag-none','Unknown'];
+  return `<span class="tag ${cls}">${label}</span>`;
+}
+
+function statusClass(s) {
+  return 'status-' + (s||'not-started').replace('_','-');
+}
+
+function ownerAvatar(ownerStr) {
+  if (!ownerStr || !plan) return '';
+  const name = ownerStr.split('/')[0].trim();
+  const member = plan.team.find(t => t.name.toLowerCase().includes(name.toLowerCase()));
+  if (!member) return `<span class="avatar" style="background:var(--surface3)">${name.slice(0,2).toUpperCase()}</span>`;
+  return `<span class="avatar" style="background:${member.color}" title="${member.name}">${member.initials}</span>`;
+}
+
+function statusSelect(currentStatus, onchange) {
+  return `<select class="status-select" onchange="${onchange}">
+    <option value="not-started" ${currentStatus==='not-started'?'selected':''}>Not Started</option>
+    <option value="in-progress" ${currentStatus==='in-progress'?'selected':''}>In Progress</option>
+    <option value="complete" ${currentStatus==='complete'?'selected':''}>Complete</option>
+    <option value="blocked" ${currentStatus==='blocked'?'selected':''}>Blocked</option>
+  </select>`;
+}
+
+// ─── VISION TAB ────────────────────────────────────────────────────────────
+
+function renderVision() {
+  const v = plan.vision;
+  
+  const valuesCards = v.coreValues.map((val,i) => `
+    <div class="card status-complete" style="cursor:default">
+      <div class="card-title">💎 ${val.value}</div>
+      <div class="card-sub">${val.description}</div>
+    </div>
+  `).join('');
+
+  const metricsRows = v.threeToFiveYear.metrics.map((m,i) => `
+    <tr>
+      <td>${m.metric}</td>
+      <td style="color:var(--text3)">${m.current}</td>
+      <td style="color:var(--green);font-weight:600">${m.target}</td>
+      <td>${ownerAvatar(m.owner)} ${m.owner}</td>
+      <td>
+        <button class="btn btn-sm" onclick="editMetric(${i})">Edit</button>
+      </td>
+    </tr>
+  `).join('');
+
+  const brandRows = v.brandPromises.map((bp,i) => `
+    <tr>
+      <td style="font-weight:600">${bp.promise}</td>
+      <td style="color:var(--yellow)">${bp.kpi}</td>
+      <td style="color:var(--text2);font-size:12px">${bp.guarantee}</td>
+      <td><button class="btn btn-sm" onclick="editBrandPromise(${i})">Edit</button></td>
+    </tr>
+  `).join('');
+
+  return `
+  <div class="main">
+    <div class="sidebar-layout">
+      <div>
+        <!-- BHAG -->
+        <div class="bhag-card">
+          <div class="bhag-label">🎯 BHAG — Big Hairy Audacious Goal (10–25 Year)</div>
+          <div class="bhag-text">${v.bhag.text}</div>
+          <div class="bhag-year">Target Year: ${v.bhag.targetYear} · Type: ${v.bhag.type}</div>
+          <div style="margin-top:12px"><button class="btn btn-sm" onclick="editBHAG()">✏️ Edit BHAG</button></div>
+        </div>
+
+        <!-- HEDGEHOG -->
+        <div class="section">
+          <div class="section-title">🦔 Hedgehog Concept</div>
+          <div class="hedgehog-grid">
+            <div class="hedgehog-circle">
+              <div class="hedgehog-icon">🏆</div>
+              <div class="hedgehog-label">Best At</div>
+              <div class="hedgehog-text">${v.hedgehog.bestAt}</div>
+            </div>
+            <div class="hedgehog-circle">
+              <div class="hedgehog-icon">⚙️</div>
+              <div class="hedgehog-label">Economic Engine</div>
+              <div class="hedgehog-text">${v.hedgehog.economicEngine}</div>
+            </div>
+            <div class="hedgehog-circle">
+              <div class="hedgehog-icon">❤️</div>
+              <div class="hedgehog-label">Passionate About</div>
+              <div class="hedgehog-text">${v.hedgehog.passion}</div>
+            </div>
+          </div>
+          <div style="text-align:center"><button class="btn btn-sm" onclick="editHedgehog()">✏️ Edit Hedgehog</button></div>
+        </div>
+
+        <!-- 3-5 YEAR METRICS -->
+        <div class="section">
+          <div class="section-title">📊 3–5 Year Targets (by ${v.threeToFiveYear.targetDate})</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+            <div class="metric-card"><div class="metric-value">${v.threeToFiveYear.aum}</div><div class="metric-label">AUM Target</div></div>
+            <div class="metric-card"><div class="metric-value">${v.threeToFiveYear.revenue}</div><div class="metric-label">Revenue Target</div></div>
+            <div class="metric-card"><div class="metric-value">&gt;25%</div><div class="metric-label">Net IRR Target</div></div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>KPI</th><th>Current</th><th>Target</th><th>Owner</th><th></th></tr></thead>
+              <tbody>${metricsRows}</tbody>
+            </table>
+          </div>
+          <button class="btn btn-sm btn-success" onclick="addMetric()">+ Add Metric</button>
+        </div>
+
+        <!-- BRAND PROMISES -->
+        <div class="section">
+          <div class="section-title">🤝 Brand Promises</div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>Promise</th><th>KPI</th><th>Guarantee</th><th></th></tr></thead>
+              <tbody>${brandRows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <!-- PURPOSE -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">🌟 Core Purpose</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:12px">${v.purpose}</div>
+          <button class="btn btn-sm" onclick="editPurpose()">✏️ Edit</button>
+        </div>
+
+        <!-- PROFIT PER X -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">💰 Profit per X</div>
+          <div style="font-size:13px;color:var(--cyan);font-weight:600;margin-bottom:12px">${v.profitPerX}</div>
+          <button class="btn btn-sm" onclick="editProfitPerX()">✏️ Edit</button>
+        </div>
+
+        <!-- SANDBOX -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">🎯 Sandbox / Core Customer</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:12px">${v.sandbox}</div>
+          <button class="btn btn-sm" onclick="editSandbox()">✏️ Edit</button>
+        </div>
+
+        <!-- VIVID DESCRIPTION -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">🔮 Vivid Description</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">${v.vividDescription}</div>
+          <button class="btn btn-sm" onclick="editVividDescription()">✏️ Edit</button>
+        </div>
+
+        <!-- CORE VALUES -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">💎 Core Values (${v.coreValues.length})</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+            ${v.coreValues.map((val,i) => `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+                <div>
+                  <div style="font-size:12px;font-weight:600">${val.value}</div>
+                  <div style="font-size:11px;color:var(--text3)">${val.description}</div>
+                </div>
+                <button class="btn btn-sm btn-icon" onclick="editValue(${i})">✏️</button>
+              </div>
+            `).join('')}
+          </div>
+          <button class="btn btn-sm btn-success" onclick="addValue()">+ Add Value</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── ANNUAL TAB ────────────────────────────────────────────────────────────
+
+function renderAnnual() {
+  const a = plan.annual;
+  
+  const rocksHTML = a.rocks.map((r,i) => `
+    <div class="card ${statusClass(r.status)}" draggable="true" data-type="annual-rock" data-idx="${i}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+        <div class="card-title">${r.title}</div>
+        <button class="btn btn-sm btn-icon" onclick="editAnnualRock(${i})" style="flex-shrink:0">✏️</button>
+      </div>
+      <div class="card-meta">
+        ${ownerAvatar(r.owner)}
+        <span style="font-size:12px;color:var(--text2)">${r.owner}</span>
+        ${statusTag(r.status)}
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--yellow)">
+        KPI: ${r.kpi} → <strong style="color:var(--green)">${r.target}</strong>
+      </div>
+      ${r.initiatives && r.initiatives.length ? `
+        <div style="margin-top:8px">
+          ${r.initiatives.map(ini => `<div style="font-size:11px;color:var(--text3);padding:2px 0">• ${ini}</div>`).join('')}
+        </div>
+      ` : ''}
+      <div style="margin-top:8px">
+        ${statusSelect(r.status, `updateRockStatus('annual',${i},this.value)`)}
+      </div>
+    </div>
+  `).join('');
+
+  const hiresHTML = a.keyHires.map((h,i) => `
+    <tr>
+      <td style="font-weight:600">${h.role}</td>
+      <td style="color:var(--text2)">${h.why}</td>
+      <td style="color:var(--yellow)">${h.byWhen}</td>
+    </tr>
+  `).join('');
+
+  return `
+  <div class="main">
+    <!-- CRITICAL NUMBER -->
+    <div class="critical-number">
+      <div class="cn-label">🎯 Annual Critical Number — ${a.year}</div>
+      <div class="cn-value">${a.criticalNumber}</div>
+      <div style="margin-top:8px"><button class="btn btn-sm" onclick="editCriticalNumber('annual')">✏️ Edit</button></div>
+    </div>
+
+    <!-- FINANCIALS -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px">
+      <div class="metric-card">
+        <div class="metric-value">${a.revenueTarget}</div>
+        <div class="metric-label">Revenue Target</div>
+        <div style="margin-top:8px"><button class="btn btn-sm" onclick="editAnnualField('revenueTarget','Revenue Target')">Edit</button></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">${a.profitTarget}</div>
+        <div class="metric-label">Profit Target</div>
+        <div style="margin-top:8px"><button class="btn btn-sm" onclick="editAnnualField('profitTarget','Profit Target')">Edit</button></div>
+      </div>
+    </div>
+
+    <!-- ANNUAL ROCKS -->
+    <div class="section">
+      <div class="section-title">🪨 Annual Rocks / Priorities (${a.rocks.length})</div>
+      <div class="filter-bar">
+        <span style="font-size:12px;color:var(--text3)">Filter:</span>
+        <div class="filter-chip active" onclick="filterRocks(this,'all')">All</div>
+        <div class="filter-chip" onclick="filterRocks(this,'in-progress')">In Progress</div>
+        <div class="filter-chip" onclick="filterRocks(this,'not-started')">Not Started</div>
+        <div class="filter-chip" onclick="filterRocks(this,'complete')">Complete</div>
+        <div class="filter-chip" onclick="filterRocks(this,'blocked')">Blocked</div>
+        <button class="btn btn-sm btn-success" style="margin-left:auto" onclick="addAnnualRock()">+ Add Rock</button>
+      </div>
+      <div class="board board-3" id="annual-rocks-board">
+        ${rocksHTML}
+      </div>
+    </div>
+
+    <!-- KEY HIRES -->
+    <div class="section">
+      <div class="section-title">👥 Key Hires Needed</div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Role</th><th>Why</th><th>By When</th></tr></thead>
+          <tbody>${hiresHTML}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="section">
+      <div class="section-title">🐝 Team</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${plan.team.map(m => `
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:10px;min-width:160px">
+            <div class="avatar" style="background:${m.color};width:36px;height:36px;font-size:13px">${m.initials}</div>
+            <div>
+              <div style="font-size:13px;font-weight:600">${m.name}</div>
+              <div style="font-size:11px;color:var(--text3)">${m.role}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── QUARTERLY TAB ─────────────────────────────────────────────────────────
+
+function renderQuarterly() {
+  const qData = plan.quarterly;
+  const cq = qData.currentQuarter;
+  const q = qData.quarters[cq] || {};
+  
+  const quarters = ['Q1-2026','Q2-2026','Q3-2026','Q4-2026'];
+  const qSelector = quarters.map(qu => 
+    `<div class="q-btn ${qu===cq?'active':''}" onclick="switchQuarter('${qu}')">${qu}</div>`
+  ).join('');
+
+  const rocksHTML = (q.rocks||[]).map((r,i) => `
+    <div class="card ${statusClass(r.status)}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+        <div class="card-title">${r.title}</div>
+        <button class="btn btn-sm btn-icon" onclick="editQuarterlyRock('${cq}',${i})">✏️</button>
+      </div>
+      <div class="card-meta">
+        ${ownerAvatar(r.owner)}
+        <span style="font-size:12px;color:var(--text2)">${r.owner}</span>
+        ${statusTag(r.status)}
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text3)">
+        Done when: <span style="color:var(--green)">${r.dod}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text3)">Deadline: <strong style="color:var(--yellow)">${r.deadline}</strong></div>
+      <div style="margin-top:8px">
+        ${statusSelect(r.status, `updateQRockStatus('${cq}',${i},this.value)`)}
+      </div>
+    </div>
+  `).join('') || '<div class="empty-state"><div class="empty-icon">⚡</div>No rocks yet — add your first quarterly priority</div>';
+
+  const sayNoHTML = (q.sayingNo||[]).map(s => `
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px;display:flex;align-items:center;gap:8px">
+      <span style="color:var(--red)">✗</span> ${s}
+    </div>
+  `).join('');
+
+  const theme = q.theme || {};
+
+  return `
+  <div class="main">
+    <div class="quarter-selector">${qSelector}</div>
+    
+    <div class="sidebar-layout">
+      <div>
+        <!-- CRITICAL NUMBER -->
+        <div class="critical-number">
+          <div class="cn-label">🎯 Critical Number — ${cq}</div>
+          <div class="cn-value">${q.criticalNumber || 'Not set'}</div>
+          ${q.criticalOwner ? `<div class="cn-owner">Owner: ${ownerAvatar(q.criticalOwner)} ${q.criticalOwner}</div>` : ''}
+          <div style="margin-top:8px"><button class="btn btn-sm" onclick="editQCriticalNumber('${cq}')">✏️ Edit</button></div>
+        </div>
+
+        <!-- QUARTERLY ROCKS -->
+        <div class="section">
+          <div class="section-title">🪨 Quarterly Rocks</div>
+          <div class="board board-3" id="qrocks-board">
+            ${rocksHTML}
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-sm btn-success" onclick="addQuarterlyRock('${cq}')">+ Add Rock</button>
+          </div>
+        </div>
+
+        <!-- SAY NO -->
+        <div class="section">
+          <div class="section-title">🚫 What We're Saying NO To</div>
+          <div class="tbl-wrap">
+            ${sayNoHTML || '<div class="empty-state">Nothing listed — add things to avoid this quarter</div>'}
+          </div>
+          <button class="btn btn-sm" style="margin-top:8px" onclick="editSayNo('${cq}')">✏️ Edit List</button>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <!-- THEME -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">🎨 Quarterly Theme</div>
+          <div style="font-size:16px;font-weight:700;color:var(--accent);margin-bottom:6px">"${theme.name||'Not set'}"</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">${theme.description||''}</div>
+          ${theme.celebration ? `<div style="font-size:12px;margin-bottom:4px"><span style="color:var(--yellow)">🎉</span> ${theme.celebration}</div>` : ''}
+          ${theme.deadline ? `<div style="font-size:12px;color:var(--text3)">Deadline: ${theme.deadline}</div>` : ''}
+          <div style="margin-top:12px"><button class="btn btn-sm" onclick="editTheme('${cq}')">✏️ Edit Theme</button></div>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">📊 Rock Progress</div>
+          ${renderProgressBar(q.rocks||[])}
+        </div>
+
+        <!-- MONTHLY OVERVIEW -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">📆 Monthly Targets</div>
+          ${Object.keys(q.monthlyTargets||{}).map(month => `
+            <div style="margin-bottom:10px">
+              <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:4px">${month}</div>
+              ${(q.monthlyTargets[month]||[]).map(t => `
+                <div style="font-size:12px;padding:3px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px">
+                  <span style="color:${t.status==='complete'?'var(--green)':t.status==='in-progress'?'var(--accent)':'var(--text3)'}">●</span>
+                  ${t.title}
+                </div>
+              `).join('')}
+            </div>
+          `).join('')}
+          <button class="btn btn-sm" onclick="showTab('monthly')">View Full Monthly →</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderProgressBar(rocks) {
+  if (!rocks.length) return '<div style="color:var(--text3);font-size:12px">No rocks yet</div>';
+  const counts = { complete: 0, 'in-progress': 0, 'not-started': 0, blocked: 0 };
+  rocks.forEach(r => { counts[r.status] = (counts[r.status]||0) + 1; });
+  const total = rocks.length;
+  const pct = Math.round((counts.complete / total) * 100);
+  return `
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span>Progress</span><span style="color:var(--green)">${pct}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${pct}%;background:var(--green)"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px">
+      <div style="color:var(--green)">✓ ${counts.complete} Complete</div>
+      <div style="color:var(--accent)">⟳ ${counts['in-progress']} In Progress</div>
+      <div style="color:var(--text3)">○ ${counts['not-started']||0} Not Started</div>
+      <div style="color:var(--red)">✗ ${counts.blocked||0} Blocked</div>
+    </div>`;
+}
+
+// ─── MONTHLY TAB ───────────────────────────────────────────────────────────
+
+function renderMonthly() {
+  const cq = plan.quarterly.currentQuarter;
+  const q = plan.quarterly.quarters[cq] || {};
+  const months = q.monthlyTargets || {};
+
+  const monthsHTML = Object.keys(months).map(month => {
+    const targets = months[month];
+    return `
+      <div class="col">
+        <div class="col-header">
+          <div class="col-label"><span class="col-icon">📆</span> ${month}</div>
+          <button class="btn btn-sm btn-icon" onclick="addMonthlyTarget('${cq}','${month}')">+</button>
+        </div>
+        <div class="col-body">
+          ${targets.map((t,i) => `
+            <div class="card ${statusClass(t.status)}">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between">
+                <div class="card-title">${t.title}</div>
+                <button class="btn btn-sm btn-icon" onclick="editMonthlyTarget('${cq}','${month}',${i})">✏️</button>
+              </div>
+              <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${ownerAvatar(t.owner)} ${t.owner}</div>
+              ${t.dueDate ? `<div style="font-size:11px;color:var(--text3)">Due: ${t.dueDate}</div>` : ''}
+              <div style="margin-top:6px">
+                ${statusSelect(t.status, `updateMonthlyStatus('${cq}','${month}',${i},this.value)`)}
+              </div>
+            </div>
+          `).join('') || '<div class="empty-state" style="padding:16px">No goals yet</div>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+  <div class="main">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <h2 style="font-size:16px;font-weight:700">Monthly Goals — ${cq}</h2>
+        <p style="font-size:12px;color:var(--text3)">Monthly priorities that build up to quarterly rocks</p>
+      </div>
+      <button class="btn btn-success" onclick="addMonth('${cq}')">+ Add Month</button>
+    </div>
+    <div class="board board-3">${monthsHTML || '<div class="loading">No months configured for this quarter</div>'}</div>
+  </div>`;
+}
+
+// ─── ONE PAGE VIEW ─────────────────────────────────────────────────────────
+
+function renderOnePage() {
+  const v = plan.vision;
+  const a = plan.annual;
+  const cq = plan.quarterly.currentQuarter;
+  const q = plan.quarterly.quarters[cq] || {};
+
+  return `
+  <div class="main">
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-primary" onclick="printOPSP()">🖨️ Print / Save PDF</button>
+      <button class="btn" onclick="exportPDF()">📷 Screenshot</button>
+    </div>
+    
+    <div id="opsp-view">
+      <div class="opsp-title-bar">
+        <div>
+          <div class="opsp-company">${plan.meta.company} — One Page Strategic Plan</div>
+          <div class="opsp-date">Updated: ${new Date(plan.meta.updatedAt).toLocaleDateString()} · ${cq} · Owner: ${plan.meta.owner}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">Scaling Up Framework · Verne Harnish</div>
+      </div>
+
+      <div class="opsp-grid">
+        <!-- COL 1: CORE VALUES -->
+        <div class="opsp-col">
+          <div class="opsp-col-header">Core Values & Purpose</div>
+          <div class="opsp-col-body">
+            <div class="opsp-section">
+              <div class="opsp-section-title">Core Values</div>
+              ${v.coreValues.map(val => `<div class="opsp-item">💎 <strong>${val.value}</strong></div>`).join('')}
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Core Purpose</div>
+              <div style="font-size:11px;color:var(--text);line-height:1.5">${v.purpose}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 2: BHAG -->
+        <div class="opsp-col">
+          <div class="opsp-col-header">BHAG & Long-Term Vision</div>
+          <div class="opsp-col-body">
+            <div class="opsp-highlight">${v.bhag.text}</div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Profit per X</div>
+              <div class="opsp-item">${v.profitPerX}</div>
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Core Customer</div>
+              <div style="font-size:11px;color:var(--text2)">${v.sandbox}</div>
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Vivid Description</div>
+              <div style="font-size:10px;color:var(--text3);line-height:1.4">${v.vividDescription}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 3: 3-5 YEAR -->
+        <div class="opsp-col">
+          <div class="opsp-col-header">3–5 Year Targets</div>
+          <div class="opsp-col-body">
+            <div class="opsp-section">
+              <div class="opsp-section-title">Financial</div>
+              <div class="opsp-item">AUM: <strong>${v.threeToFiveYear.aum}</strong></div>
+              <div class="opsp-item">Revenue: <strong>${v.threeToFiveYear.revenue}</strong></div>
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">KPIs</div>
+              ${v.threeToFiveYear.metrics.map(m => `<div class="opsp-item">${m.metric}: <strong>${m.target}</strong></div>`).join('')}
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Brand Promises</div>
+              ${v.brandPromises.map(bp => `<div class="opsp-item">• ${bp.promise}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 4: ANNUAL -->
+        <div class="opsp-col">
+          <div class="opsp-col-header">1-Year Goals (${a.year})</div>
+          <div class="opsp-col-body">
+            <div class="opsp-section">
+              <div class="opsp-section-title">Financial</div>
+              <div class="opsp-item">Revenue: ${a.revenueTarget}</div>
+              <div class="opsp-item">Profit: ${a.profitTarget}</div>
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Critical Number</div>
+              <div class="opsp-highlight">${a.criticalNumber}</div>
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Annual Rocks</div>
+              ${a.rocks.map(r => `<div class="opsp-item">• ${r.title} <span style="color:var(--text3)">(${r.owner})</span></div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 5: QUARTERLY ROCKS -->
+        <div class="opsp-col">
+          <div class="opsp-col-header">Quarterly Rocks (${cq})</div>
+          <div class="opsp-col-body">
+            <div class="opsp-section">
+              <div class="opsp-section-title">Critical Number</div>
+              <div class="opsp-highlight">${q.criticalNumber||'Not set'}</div>
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Rocks</div>
+              ${(q.rocks||[]).map(r => `<div class="opsp-item">• ${r.title}<br><span style="color:var(--text3);font-size:10px">Owner: ${r.owner} · Due: ${r.deadline}</span></div>`).join('')}
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Saying No To</div>
+              ${(q.sayingNo||[]).map(s => `<div class="opsp-item" style="color:var(--red)">✗ ${s}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 6: THEME -->
+        <div class="opsp-col">
+          <div class="opsp-col-header">Quarterly Theme</div>
+          <div class="opsp-col-body">
+            <div class="opsp-section">
+              <div class="opsp-section-title">Theme</div>
+              <div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:6px">"${(q.theme||{}).name||'TBD'}"</div>
+              <div style="font-size:11px;color:var(--text2)">${(q.theme||{}).description||''}</div>
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Celebration</div>
+              <div class="opsp-item">${(q.theme||{}).celebration||'TBD'}</div>
+            </div>
+            <div class="opsp-section">
+              <div class="opsp-section-title">Deadline</div>
+              <div class="opsp-item" style="color:var(--yellow);font-weight:600">${(q.theme||{}).deadline||''}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 7: ACCOUNTABILITY -->
+        <div class="opsp-col">
+          <div class="opsp-col-header">Accountability</div>
+          <div class="opsp-col-body">
+            <div class="opsp-section">
+              <div class="opsp-section-title">Rocks by Owner</div>
+              ${[...new Set([...a.rocks.map(r=>r.owner), ...(q.rocks||[]).map(r=>r.owner)].map(o=>o.split('/')[0].trim()))].map(owner => {
+                const ownerRocks = [...a.rocks.filter(r=>r.owner.includes(owner)), ...(q.rocks||[]).filter(r=>r.owner.includes(owner))];
+                return ownerRocks.length ? `
+                  <div class="opsp-item" style="padding-top:4px">
+                    <strong>${owner}</strong><br>
+                    ${ownerRocks.slice(0,3).map(r => `<span style="font-size:10px;color:var(--text3)">• ${r.title.slice(0,40)}${r.title.length>40?'...':''}</span><br>`).join('')}
+                  </div>
+                ` : '';
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── 7 STRATA TAB ─────────────────────────────────────────────────────────
+
+function renderStrata() {
+  const s = plan.vision.sevenStrata || {};
+  
+  const strata = [
+    { num: 1, color: 'var(--purple)', icon: '🔤', title: 'Words You Own', key: 'wordsOwn', desc: 'What word or phrase do you want customers to uniquely associate with you?' },
+    { num: 2, color: 'var(--cyan)', icon: '🎯', title: 'Sandbox & Brand Promises', key: 'sandboxPromises', desc: 'Who is your core customer? What 3 promises will you make them?' },
+    { num: 3, color: 'var(--blue)', icon: '🛡️', title: 'Brand Promise Guarantee', key: 'guarantee', desc: 'What makes it painful to break your promise?' },
+    { num: 4, color: 'var(--green)', icon: '💡', title: 'One-Phrase Strategy', key: 'onePhrase', desc: 'The core trade-off that drives your profits' },
+    { num: 5, color: 'var(--yellow)', icon: '⚙️', title: 'Differentiating Activities', key: 'activities', desc: 'Activities competitors cannot easily replicate' },
+    { num: 6, color: 'var(--orange)', icon: '⚡', title: 'X-Factor', key: 'xFactor', desc: 'Your 10x–100x underlying advantage' },
+    { num: 7, color: 'var(--accent)', icon: '🚀', title: 'Profit per X & BHAG', key: 'profitBhag', desc: 'Your economic engine and long-term destination' }
+  ];
+
+  return `
+  <div class="main">
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:16px;font-weight:700;margin-bottom:4px">🏔 7 Strata of Strategy</h2>
+      <p style="font-size:13px;color:var(--text2)">Verne Harnish's framework for building a defensible, differentiated competitive position. Complete top to bottom.</p>
+    </div>
+    ${strata.map(st => `
+      <div class="wide-card" style="border-left:3px solid ${st.color}">
+        <div class="wide-card-title" style="color:${st.color}">
+          ${st.icon} Stratum ${st.num}: ${st.title}
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-style:italic">${st.desc}</div>
+        <div class="wide-card-content">
+          ${st.key === 'activities' && Array.isArray(s[st.key]) 
+            ? `<ul style="padding-left:18px">${s[st.key].map(a => `<li style="margin-bottom:4px;color:var(--text2)">${a}</li>`).join('')}</ul>`
+            : `<div style="color:var(--text)">${s[st.key] || '<span style="color:var(--text3);font-style:italic">Not yet defined — click Edit to fill in</span>'}</div>`
+          }
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-sm" onclick="editStratum(${st.num},'${st.key}','${st.title}')">✏️ Edit</button>
+        </div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+// ─── MODAL SYSTEM ──────────────────────────────────────────────────────────
+
+function openModal(title, bodyHTML, onSubmit, footerHTML) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  if (footerHTML) document.getElementById('modal-footer').innerHTML = footerHTML;
+  else document.getElementById('modal-footer').innerHTML = '<button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitModal()">Save</button>';
+  document.getElementById('modal').style.display = 'flex';
+  currentModal = onSubmit;
+  // Focus first input
+  setTimeout(() => {
+    const inp = document.querySelector('#modal-body input, #modal-body textarea, #modal-body select');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+  currentModal = null;
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+function submitModal() {
+  if (currentModal) {
+    const result = currentModal();
+    if (result !== false) {
+      closeModal();
+      markUnsaved();
+      renderTab(activeTab);
+    }
+  }
+}
+
+// ─── EDIT FUNCTIONS ────────────────────────────────────────────────────────
+
+function editBHAG() {
+  const bhag = plan.vision.bhag;
+  openModal('Edit BHAG', `
+    <div class="form-group">
+      <label class="form-label">BHAG Statement</label>
+      <textarea class="form-input" id="bhag-text" rows="4">${bhag.text}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target Year</label>
+      <input class="form-input" type="number" id="bhag-year" value="${bhag.targetYear}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">BHAG Type</label>
+      <select class="form-input" id="bhag-type">
+        <option value="target" ${bhag.type==='target'?'selected':''}>Target (quantitative goal)</option>
+        <option value="competitive" ${bhag.type==='competitive'?'selected':''}>Competitive (beat a competitor)</option>
+        <option value="role-model" ${bhag.type==='role-model'?'selected':''}>Role Model</option>
+        <option value="transformation" ${bhag.type==='transformation'?'selected':''}>Internal Transformation</option>
+      </select>
+    </div>
+  `, () => {
+    plan.vision.bhag.text = document.getElementById('bhag-text').value;
+    plan.vision.bhag.targetYear = parseInt(document.getElementById('bhag-year').value);
+    plan.vision.bhag.type = document.getElementById('bhag-type').value;
+  });
+}
+
+function editPurpose() {
+  openModal('Edit Core Purpose', `
+    <div class="form-group">
+      <label class="form-label">Why We Exist (beyond making money)</label>
+      <textarea class="form-input" id="purpose-text" rows="4">${plan.vision.purpose}</textarea>
+    </div>
+  `, () => { plan.vision.purpose = document.getElementById('purpose-text').value; });
+}
+
+function editProfitPerX() {
+  openModal('Edit Profit per X', `
+    <div class="form-group">
+      <label class="form-label">Profit per X (economic denominator)</label>
+      <input class="form-input" id="ppx" value="${plan.vision.profitPerX}">
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">e.g. "Carried interest per LP dollar invested" or "Profit per customer visit"</div>
+    </div>
+  `, () => { plan.vision.profitPerX = document.getElementById('ppx').value; });
+}
+
+function editSandbox() {
+  openModal('Edit Core Customer / Sandbox', `
+    <div class="form-group">
+      <label class="form-label">Core Customer (25 words or less)</label>
+      <textarea class="form-input" id="sandbox" rows="3">${plan.vision.sandbox}</textarea>
+    </div>
+  `, () => { plan.vision.sandbox = document.getElementById('sandbox').value; });
+}
+
+function editVividDescription() {
+  openModal('Edit Vivid Description', `
+    <div class="form-group">
+      <label class="form-label">What does success look like?</label>
+      <textarea class="form-input" id="vivid" rows="5">${plan.vision.vividDescription}</textarea>
+    </div>
+  `, () => { plan.vision.vividDescription = document.getElementById('vivid').value; });
+}
+
+function editHedgehog() {
+  const h = plan.vision.hedgehog;
+  openModal('Edit Hedgehog Concept', `
+    <div class="form-group">
+      <label class="form-label">🏆 What can you be best in world at?</label>
+      <textarea class="form-input" id="h-best" rows="2">${h.bestAt}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">⚙️ What drives your economic engine?</label>
+      <textarea class="form-input" id="h-engine" rows="2">${h.economicEngine}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">❤️ What are you deeply passionate about?</label>
+      <textarea class="form-input" id="h-passion" rows="2">${h.passion}</textarea>
+    </div>
+  `, () => {
+    plan.vision.hedgehog.bestAt = document.getElementById('h-best').value;
+    plan.vision.hedgehog.economicEngine = document.getElementById('h-engine').value;
+    plan.vision.hedgehog.passion = document.getElementById('h-passion').value;
+  });
+}
+
+function editValue(i) {
+  const val = plan.vision.coreValues[i];
+  openModal('Edit Core Value', `
+    <div class="form-group">
+      <label class="form-label">Value Name</label>
+      <input class="form-input" id="val-name" value="${val.value}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="val-desc" rows="2">${val.description}</textarea>
+    </div>
+  `, () => {
+    plan.vision.coreValues[i].value = document.getElementById('val-name').value;
+    plan.vision.coreValues[i].description = document.getElementById('val-desc').value;
+  });
+}
+
+function addValue() {
+  openModal('Add Core Value', `
+    <div class="form-group">
+      <label class="form-label">Value Name</label>
+      <input class="form-input" id="val-name" placeholder="e.g. Radical transparency">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description (behavioral phrase)</label>
+      <textarea class="form-input" id="val-desc" rows="2" placeholder="e.g. We share information openly and honestly..."></textarea>
+    </div>
+  `, () => {
+    const name = document.getElementById('val-name').value.trim();
+    if (!name) return false;
+    plan.vision.coreValues.push({ id: 'v'+Date.now(), value: name, description: document.getElementById('val-desc').value, status: 'active' });
+  });
+}
+
+function editMetric(i) {
+  const m = plan.vision.threeToFiveYear.metrics[i];
+  openModal('Edit 3-5 Year Metric', `
+    <div class="form-group">
+      <label class="form-label">Metric</label>
+      <input class="form-input" id="m-metric" value="${m.metric}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Current Value</label>
+      <input class="form-input" id="m-current" value="${m.current}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target</label>
+      <input class="form-input" id="m-target" value="${m.target}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="m-owner" value="${m.owner}">
+    </div>
+  `, () => {
+    plan.vision.threeToFiveYear.metrics[i] = {
+      ...m,
+      metric: document.getElementById('m-metric').value,
+      current: document.getElementById('m-current').value,
+      target: document.getElementById('m-target').value,
+      owner: document.getElementById('m-owner').value
+    };
+  });
+}
+
+function addMetric() {
+  openModal('Add 3-5 Year Metric', `
+    <div class="form-group">
+      <label class="form-label">Metric</label>
+      <input class="form-input" id="m-metric" placeholder="e.g. LP NPS Score">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Current Value</label>
+      <input class="form-input" id="m-current" placeholder="e.g. TBD">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target</label>
+      <input class="form-input" id="m-target" placeholder="e.g. >70">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="m-owner" placeholder="e.g. Greg">
+    </div>
+  `, () => {
+    const metric = document.getElementById('m-metric').value.trim();
+    if (!metric) return false;
+    plan.vision.threeToFiveYear.metrics.push({ id:'m'+Date.now(), metric, current: document.getElementById('m-current').value, target: document.getElementById('m-target').value, owner: document.getElementById('m-owner').value });
+  });
+}
+
+function editBrandPromise(i) {
+  const bp = plan.vision.brandPromises[i];
+  openModal('Edit Brand Promise', `
+    <div class="form-group">
+      <label class="form-label">Promise</label>
+      <input class="form-input" id="bp-promise" value="${bp.promise}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">KPI (how you measure it)</label>
+      <input class="form-input" id="bp-kpi" value="${bp.kpi}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Guarantee (what happens if you fail)</label>
+      <textarea class="form-input" id="bp-guarantee" rows="2">${bp.guarantee}</textarea>
+    </div>
+  `, () => {
+    plan.vision.brandPromises[i] = { ...bp, promise: document.getElementById('bp-promise').value, kpi: document.getElementById('bp-kpi').value, guarantee: document.getElementById('bp-guarantee').value };
+  });
+}
+
+function editAnnualField(field, label) {
+  openModal(`Edit ${label}`, `
+    <div class="form-group">
+      <label class="form-label">${label}</label>
+      <input class="form-input" id="af-val" value="${plan.annual[field]}">
+    </div>
+  `, () => { plan.annual[field] = document.getElementById('af-val').value; });
+}
+
+function editCriticalNumber(level) {
+  const obj = level === 'annual' ? plan.annual : plan.quarterly.quarters[plan.quarterly.currentQuarter];
+  openModal('Edit Critical Number', `
+    <div class="form-group">
+      <label class="form-label">Critical Number — The ONE metric that matters most</label>
+      <textarea class="form-input" id="cn-val" rows="3">${obj.criticalNumber}</textarea>
+    </div>
+  `, () => { obj.criticalNumber = document.getElementById('cn-val').value; });
+}
+
+function editAnnualRock(i) {
+  const r = plan.annual.rocks[i];
+  openModal('Edit Annual Rock', `
+    <div class="form-group">
+      <label class="form-label">Rock Title</label>
+      <input class="form-input" id="r-title" value="${r.title}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="r-owner" value="${r.owner}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">KPI</label>
+      <input class="form-input" id="r-kpi" value="${r.kpi}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target</label>
+      <input class="form-input" id="r-target" value="${r.target}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="r-status">
+        <option value="not-started" ${r.status==='not-started'?'selected':''}>Not Started</option>
+        <option value="in-progress" ${r.status==='in-progress'?'selected':''}>In Progress</option>
+        <option value="complete" ${r.status==='complete'?'selected':''}>Complete</option>
+        <option value="blocked" ${r.status==='blocked'?'selected':''}>Blocked</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Key Initiatives (one per line)</label>
+      <textarea class="form-input" id="r-ini" rows="3">${(r.initiatives||[]).join('\n')}</textarea>
+    </div>
+  `, () => {
+    plan.annual.rocks[i] = { ...r, title: document.getElementById('r-title').value, owner: document.getElementById('r-owner').value, kpi: document.getElementById('r-kpi').value, target: document.getElementById('r-target').value, status: document.getElementById('r-status').value, initiatives: document.getElementById('r-ini').value.split('\n').filter(s=>s.trim()) };
+  });
+}
+
+function addAnnualRock() {
+  openModal('Add Annual Rock', `
+    <div class="form-group">
+      <label class="form-label">Rock Title</label>
+      <input class="form-input" id="r-title" placeholder="e.g. Close Series A">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="r-owner" placeholder="e.g. Greg">
+    </div>
+    <div class="form-group">
+      <label class="form-label">KPI</label>
+      <input class="form-input" id="r-kpi" placeholder="e.g. Capital raised">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target</label>
+      <input class="form-input" id="r-target" placeholder="e.g. $5M+">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Key Initiatives (one per line)</label>
+      <textarea class="form-input" id="r-ini" rows="3"></textarea>
+    </div>
+  `, () => {
+    const title = document.getElementById('r-title').value.trim();
+    if (!title) return false;
+    plan.annual.rocks.push({ id:'r'+Date.now(), title, owner: document.getElementById('r-owner').value, kpi: document.getElementById('r-kpi').value, target: document.getElementById('r-target').value, status: 'not-started', initiatives: document.getElementById('r-ini').value.split('\n').filter(s=>s.trim()) });
+  });
+}
+
+function switchQuarter(q) {
+  plan.quarterly.currentQuarter = q;
+  if (!plan.quarterly.quarters[q]) {
+    plan.quarterly.quarters[q] = { criticalNumber: '', criticalOwner: '', rocks: [], sayingNo: [], theme: {}, thirteenWeekRace: [], monthlyTargets: {} };
+  }
+  markUnsaved();
+  renderTab('quarterly');
+}
+
+function editQCriticalNumber(q) {
+  const qData = plan.quarterly.quarters[q];
+  openModal(`Edit Critical Number — ${q}`, `
+    <div class="form-group">
+      <label class="form-label">Critical Number</label>
+      <textarea class="form-input" id="qcn-val" rows="3">${qData.criticalNumber||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="qcn-owner" value="${qData.criticalOwner||''}">
+    </div>
+  `, () => {
+    plan.quarterly.quarters[q].criticalNumber = document.getElementById('qcn-val').value;
+    plan.quarterly.quarters[q].criticalOwner = document.getElementById('qcn-owner').value;
+  });
+}
+
+function editQuarterlyRock(q, i) {
+  const r = plan.quarterly.quarters[q].rocks[i];
+  openModal(`Edit Rock — ${q}`, `
+    <div class="form-group">
+      <label class="form-label">Rock Title</label>
+      <input class="form-input" id="qr-title" value="${r.title}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="qr-owner" value="${r.owner}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Definition of Done</label>
+      <textarea class="form-input" id="qr-dod" rows="2">${r.dod}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Deadline</label>
+      <input class="form-input" type="date" id="qr-deadline" value="${r.deadline}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="qr-status">
+        <option value="not-started" ${r.status==='not-started'?'selected':''}>Not Started</option>
+        <option value="in-progress" ${r.status==='in-progress'?'selected':''}>In Progress</option>
+        <option value="complete" ${r.status==='complete'?'selected':''}>Complete</option>
+        <option value="blocked" ${r.status==='blocked'?'selected':''}>Blocked</option>
+      </select>
+    </div>
+  `, () => {
+    plan.quarterly.quarters[q].rocks[i] = { ...r, title: document.getElementById('qr-title').value, owner: document.getElementById('qr-owner').value, dod: document.getElementById('qr-dod').value, deadline: document.getElementById('qr-deadline').value, status: document.getElementById('qr-status').value };
+  });
+}
+
+function addQuarterlyRock(q) {
+  openModal(`Add Rock — ${q}`, `
+    <div class="form-group">
+      <label class="form-label">Rock Title</label>
+      <input class="form-input" id="qr-title" placeholder="e.g. First close DF Fund I">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="qr-owner" placeholder="e.g. Greg">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Definition of Done</label>
+      <textarea class="form-input" id="qr-dod" rows="2" placeholder="Clear, measurable completion criteria"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Deadline</label>
+      <input class="form-input" type="date" id="qr-deadline">
+    </div>
+  `, () => {
+    const title = document.getElementById('qr-title').value.trim();
+    if (!title) return false;
+    plan.quarterly.quarters[q].rocks.push({ id:'qr'+Date.now(), title, owner: document.getElementById('qr-owner').value, dod: document.getElementById('qr-dod').value, deadline: document.getElementById('qr-deadline').value, status: 'not-started' });
+  });
+}
+
+function editTheme(q) {
+  const t = plan.quarterly.quarters[q].theme || {};
+  openModal(`Edit Quarterly Theme — ${q}`, `
+    <div class="form-group">
+      <label class="form-label">Theme Name</label>
+      <input class="form-input" id="t-name" value="${t.name||''}" placeholder="e.g. First Close, First Blood">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="t-desc" rows="2">${t.description||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Celebration</label>
+      <input class="form-input" id="t-cel" value="${t.celebration||''}" placeholder="What happens when you hit the target?">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Deadline</label>
+      <input class="form-input" type="date" id="t-deadline" value="${t.deadline||''}">
+    </div>
+  `, () => {
+    plan.quarterly.quarters[q].theme = { name: document.getElementById('t-name').value, description: document.getElementById('t-desc').value, celebration: document.getElementById('t-cel').value, deadline: document.getElementById('t-deadline').value };
+  });
+}
+
+function editSayNo(q) {
+  const sayNo = plan.quarterly.quarters[q].sayingNo || [];
+  openModal(`What We're Saying NO To — ${q}`, `
+    <div class="form-group">
+      <label class="form-label">One item per line</label>
+      <textarea class="form-input" id="sn-list" rows="6">${sayNo.join('\n')}</textarea>
+    </div>
+  `, () => {
+    plan.quarterly.quarters[q].sayingNo = document.getElementById('sn-list').value.split('\n').filter(s=>s.trim());
+  });
+}
+
+function addMonthlyTarget(q, month) {
+  openModal(`Add Goal — ${month}`, `
+    <div class="form-group">
+      <label class="form-label">Goal Title</label>
+      <input class="form-input" id="mt-title" placeholder="e.g. Complete LP reports">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="mt-owner" placeholder="e.g. Greg">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Due Date</label>
+      <input class="form-input" type="date" id="mt-due">
+    </div>
+  `, () => {
+    const title = document.getElementById('mt-title').value.trim();
+    if (!title) return false;
+    if (!plan.quarterly.quarters[q].monthlyTargets[month]) plan.quarterly.quarters[q].monthlyTargets[month] = [];
+    plan.quarterly.quarters[q].monthlyTargets[month].push({ id:'mt'+Date.now(), title, owner: document.getElementById('mt-owner').value, status: 'not-started', dueDate: document.getElementById('mt-due').value });
+  });
+}
+
+function editMonthlyTarget(q, month, i) {
+  const t = plan.quarterly.quarters[q].monthlyTargets[month][i];
+  openModal(`Edit Goal — ${month}`, `
+    <div class="form-group">
+      <label class="form-label">Goal Title</label>
+      <input class="form-input" id="mt-title" value="${t.title}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <input class="form-input" id="mt-owner" value="${t.owner}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Due Date</label>
+      <input class="form-input" type="date" id="mt-due" value="${t.dueDate||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="mt-status">
+        <option value="not-started" ${t.status==='not-started'?'selected':''}>Not Started</option>
+        <option value="in-progress" ${t.status==='in-progress'?'selected':''}>In Progress</option>
+        <option value="complete" ${t.status==='complete'?'selected':''}>Complete</option>
+        <option value="blocked" ${t.status==='blocked'?'selected':''}>Blocked</option>
+      </select>
+    </div>
+  `, () => {
+    plan.quarterly.quarters[q].monthlyTargets[month][i] = { ...t, title: document.getElementById('mt-title').value, owner: document.getElementById('mt-owner').value, dueDate: document.getElementById('mt-due').value, status: document.getElementById('mt-status').value };
+  });
+}
+
+function addMonth(q) {
+  openModal('Add Month', `
+    <div class="form-group">
+      <label class="form-label">Month</label>
+      <input class="form-input" id="new-month" placeholder="e.g. July 2026">
+    </div>
+  `, () => {
+    const month = document.getElementById('new-month').value.trim();
+    if (!month) return false;
+    if (!plan.quarterly.quarters[q].monthlyTargets[month]) plan.quarterly.quarters[q].monthlyTargets[month] = [];
+  });
+}
+
+function editStratum(num, key, title) {
+  const s = plan.vision.sevenStrata || {};
+  const isArray = key === 'activities';
+  openModal(`Edit Stratum ${num}: ${title}`, `
+    <div class="form-group">
+      <label class="form-label">${title}</label>
+      <textarea class="form-input" id="st-val" rows="${isArray?6:3}">${isArray ? (Array.isArray(s[key]) ? s[key].join('\n') : '') : (s[key]||'')}</textarea>
+      ${isArray ? '<div style="font-size:11px;color:var(--text3);margin-top:4px">One item per line</div>' : ''}
+    </div>
+  `, () => {
+    const val = document.getElementById('st-val').value;
+    if (!plan.vision.sevenStrata) plan.vision.sevenStrata = {};
+    if (isArray) plan.vision.sevenStrata[key] = val.split('\n').filter(s=>s.trim());
+    else plan.vision.sevenStrata[key] = val;
+  });
+}
+
+// ─── STATUS UPDATES ────────────────────────────────────────────────────────
+
+function updateRockStatus(type, i, val) {
+  if (type === 'annual') plan.annual.rocks[i].status = val;
+  markUnsaved();
+}
+
+function updateQRockStatus(q, i, val) {
+  plan.quarterly.quarters[q].rocks[i].status = val;
+  markUnsaved();
+}
+
+function updateMonthlyStatus(q, month, i, val) {
+  plan.quarterly.quarters[q].monthlyTargets[month][i].status = val;
+  markUnsaved();
+}
+
+// ─── FILTER ────────────────────────────────────────────────────────────────
+
+function filterRocks(chip, status) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  const board = document.getElementById('annual-rocks-board');
+  if (!board) return;
+  board.querySelectorAll('.card').forEach(card => {
+    if (status === 'all') card.style.display = '';
+    else card.style.display = card.classList.contains('status-'+status) ? '' : 'none';
+  });
+}
+
+// ─── VERSIONS ──────────────────────────────────────────────────────────────
+
+async function showVersions() {
+  showToast('📋 Version history not available in standalone mode', 'info');
+  return;
+}
+async function _showVersions_disabled() {
+  try {
+    const r = await fetch(`${API}/versions`);
+    const j = await r.json();
+    const versions = j.versions || [];
+    const rowsHTML = versions.slice(0,20).map(v => `
+      <div class="version-item">
+        <div>
+          <div class="version-time">${new Date(v.savedAt).toLocaleString()}</div>
+          <div class="version-id">#${v.id}</div>
+        </div>
+        <button class="btn btn-sm" onclick="restoreVersion('${v.id}')">Restore</button>
+      </div>
+    `).join('') || '<div class="empty-state">No versions yet</div>';
+    
+    openModal('Version History', `
+      <div style="max-height:400px;overflow-y:auto;margin:-20px">
+        ${rowsHTML}
+      </div>
+    `, null, '<button class="btn" onclick="closeModal()">Close</button>');
+  } catch (e) {
+    showToast('Failed to load versions', 'error');
+  }
+}
+
+async function restoreVersion(id) {
+  if (!confirm('Restore this version? Current plan will be saved as a new version first.')) return;
+  try {
+    await savePlan(); // Save current first
+    const r = await fetch(`${API}/restore/${id}`, { method: 'POST' });
+    const j = await r.json();
+    if (j.ok) {
+      await loadPlan();
+      closeModal();
+      showToast('✅ Version restored');
+    }
+  } catch (e) {
+    showToast('Restore failed: ' + e.message, 'error');
+  }
+}
+
+// ─── EXPORT ────────────────────────────────────────────────────────────────
+
+function printOPSP() {
+  showTab('onepage');
+  setTimeout(() => window.print(), 500);
+}
+
+async function exportPDF() {
+  showTab('onepage');
+  showToast('Preparing screenshot...', 'success');
+  setTimeout(async () => {
+    try {
+      const el = document.getElementById('opsp-view');
+      const canvas = await html2canvas(el, { backgroundColor: '#111827', scale: 2 });
+      const link = document.createElement('a');
+      link.download = `OPSP-${plan.meta.company}-${new Date().toISOString().slice(0,10)}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('✅ Screenshot downloaded');
+    } catch (e) {
+      showToast('Export error: ' + e.message, 'error');
+    }
+  }, 800);
+}
+
+// ─── DRAG & DROP ───────────────────────────────────────────────────────────
+
+function attachDragDrop() {
+  document.querySelectorAll('.card[draggable]').forEach(card => {
+    card.addEventListener('dragstart', e => {
+      dragSource = card;
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      dragSource = null;
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      if (dragSource && dragSource !== card) {
+        const parent = card.parentNode;
+        const sourceIdx = [...parent.children].indexOf(dragSource);
+        const targetIdx = [...parent.children].indexOf(card);
+        parent.insertBefore(dragSource, sourceIdx < targetIdx ? card.nextSibling : card);
+        // Reorder plan data
+        reorderRocks(card.dataset.type, sourceIdx, targetIdx);
+      }
+    });
+  });
+}
+
+function reorderRocks(type, from, to) {
+  if (type === 'annual-rock') {
+    const arr = plan.annual.rocks;
+    const item = arr.splice(from, 1)[0];
+    arr.splice(to, 0, item);
+    markUnsaved();
+  }
+}
+
+// ─── TOAST ─────────────────────────────────────────────────────────────────
+
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ─── KEYBOARD SHORTCUTS ────────────────────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); savePlan(); }
+  if (e.key === 'Escape') closeModal();
+});
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+
+loadPlan();
+</script>
+</body>
+</html>
